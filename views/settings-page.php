@@ -55,5 +55,51 @@ do_action('qm/debug', $feeds);
             </td>
         </tr>
     </table>
+</form><!-- CREATE NEW SETTINGS PAGE -->
 
-</form>
+<br>
+
+<?php
+$feeds = get_option('pfn_dashboard_feeds');
+
+if ( !empty($feeds) ) : // DISPLAY TABLE IF IT OPTIONS DEFINED
+?>
+    <h2>Active Post Feeds</h2>
+    <p class="description">
+        Delete current post category from dashboard feeds.
+    </p>
+
+    <form action="<?php echo admin_url('admin-post.php') ?>" method="post">
+        <input type="hidden" name="action" value="delete_feed">
+        <table>
+            <thead>
+                <th>
+                    Post Category
+                </th>
+            </thead>
+            <tbody>
+
+                <?php
+                foreach ( $feeds as $term_id ) :
+                    /**
+                     * @var WP_Term
+                     */
+                    $wp_term = get_term($term_id);
+                ?>
+                    <tr>
+                        <td>
+                            <?php echo $wp_term->name ?>
+                        </td>
+                        <td>
+                            <button class="button button-update button-link-delete"
+                                    name="term_id" value="<?php echo $term_id; ?>" type="submit">
+                                Delete
+                            </button>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+
+            </tbody>
+        </table>
+    </form>
+<?php endif; ?>
