@@ -23,8 +23,9 @@ class PostFeedNotification {
         add_action( 'admin_menu', [ $this, 'register_settings_page' ], 10, 0 );
         add_action( 'admin_post_create_new_feed', [ $this, 'create_new_feed' ], 10, 0 );
         add_action( 'admin_post_delete_feed', [ $this, 'delete_feed' ], 10, 0 );
-        add_action( 'admin_notices', [$this, 'settings_page_notifications'], 10, 0 );
-        add_action( 'wp_dashboard_setup', 'setup_dashboard_feeds', 10, 0 );
+        add_action( 'admin_notices', [ $this, 'settings_page_notifications' ], 10, 0 );
+        add_action( 'wp_dashboard_setup', [ $this, 'setup_dashboard_feeds' ], 10, 0 );
+        add_action( 'admin_head', [ $this, 'dashboard_styles' ], 10, 0 );
 
     }
 
@@ -194,28 +195,63 @@ class PostFeedNotification {
          */
         $feeds = get_option('pfn_dashboard_feeds');
 
-        if ( !$feeds ) {
+        if ( !empty($feeds) ) {
+
+            /**
+             * @var WP_Term[]
+             */
+            $wp_terms = array_map( fn(int $term_id) => get_term($term_id), $feeds );
+
+            foreach ( $wp_terms as $wp_term ) {
+
+                wp_add_dashboard_widget(
+                    "pfn-dashboard-{$wp_term->slug}",
+                    "{$wp_term->name} Feed ",
+                    [$this, 'dashboard_widget'],
+                    null,
+                    $wp_term
+                );
+
+            }
+
 
         }
 
-        /**
-         * @var WP_Term[]
-         */
-        $wp_terms = array_map( fn(int $term_id) => get_term($term_id), $feeds );
+    }
 
-        wp_add_dashboard_widget(
-            'pfn-dashboard-widget',
-            'Post Feed Dashboard',
-            [$this, 'dashboard_widget'],
-            null,
-        );
+    /**
+     * DASHBOARD WIDGET TEMPLATE
+     * Renders HTML for admin dashboard widget.
+     * @param string $var             - not sure...
+     * @param array $callback_args    - assoc array with id, title, and callback. args key is option (arg from wp_add_dashboard_widget)
+     */
+    public function dashboard_widget( string $var, array $callback_args ) {
+
+        require 'views/dashboard-widget.php';
 
     }
 
-    public function dashboard_widget() {
+    /**
+     * STYLING FOR DASHBOARD WIDGETS
+     */
+    public function dashboard_styles() {
 
+        $feeds          = get_option('pfn_dashboard_feeds');
+        $wp_terms       = array_map( fn (int $term_id) => get_term($term_id), $feeds );
+        $dashboard_ids  = array_map( fn (WP_Term $wp_term) => "#pfn-dashboard-{$wp_term->slug}", $wp_terms );
+        $css_selectors  = join(', ', $dashboard_ids);
 
+        if ( !empty($feeds) ) {
+            ?>
 
+            <style>
+                <?php echo $css_selectors ?> {
+                    background: #feff9c;
+                }
+            </style>
+
+            <?php
+        }
     }
 
 }
