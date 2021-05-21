@@ -16,16 +16,28 @@ $id      = $callback_args['id'];
 //do_action('qm/debug', $id);
 ?>
 
-<style>
-    <?php echo "#$id;" ?> {
-        background: #feff9c;
-    }
-</style>
-
 <h1><?php echo $wp_term->name; ?></h1>
 
 <?php
 $description = $wp_term->description;
-if ( !empty($description) ) : ?>
+if ( !empty($description) ) :
+    ?>
+
     <p><?php echo $description; ?></p>
+
 <?php endif; ?>
+
+<div>
+    <ul>
+        <?php
+        $args = array(
+            'numberposts' => 5, // max number of posts
+
+        );
+        $posts = get_posts($args);
+
+//        foreach () :
+
+        ?>
+    </ul>
+</div>
