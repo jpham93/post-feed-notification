@@ -11,7 +11,6 @@
  * @var WP_Term
  */
 $wp_term = $callback_args['args'];
-$id      = $callback_args['id'];
 
 //do_action('qm/debug', $id);
 ?>
@@ -31,13 +30,41 @@ if ( !empty($description) ) :
     <ul>
         <?php
         $args = array(
-            'numberposts' => 5, // max number of posts
-
+            'post_type'     => 'post',
+            'post_status'   => 'any',
+            'posts_per_page' => '5',
+            'tax_query'     => array(
+                array(
+                    'taxonomy' => 'category',
+                    'field'    => 'slug',
+                    'terms'    => $wp_term->slug,
+                ),
+            ),
+            'order'         => 'DESC',
+            'orderby'       => 'date'
         );
-        $posts = get_posts($args);
 
-//        foreach () :
+        $wp_query = new WP_Query($args);
 
-        ?>
+        $posts = $wp_query->get_posts();
+
+        do_action('qm/debug', $posts);
+
+        foreach ($posts as $post) :
+
+            ?>
+
+            <li>
+                <p class="dashboard-feed-item">
+                    <a href="<?php echo get_permalink($post->ID); ?>" class="post-link">
+                        <strong><?php echo $post->post_title; ?></strong>
+                    </a>
+                    <span class="post-date">
+                        <strong><?php echo date_format(new DateTime($post->post_date), 'M d, Y'); ?></strong>
+                    </span>
+                </p>
+            </li>
+
+        <?php endforeach; ?>
     </ul>
 </div>

@@ -248,6 +248,11 @@ class PostFeedNotification {
                 <?php echo $css_selectors ?> {
                     background: #feff9c;
                 }
+
+                p.dashboard-feed-item {
+                    display: flex;
+                    justify-content: space-between;
+                }
             </style>
 
             <?php
