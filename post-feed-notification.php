@@ -4,7 +4,7 @@ Plugin Name:    Post Feed Notification
 Plugin URI:     https://github.com/jpham93/post-feed-notification
 Description:    A basic plugin that provides a dashboard feed of the newest post in a specified category. Also emails users of newly created posts.
 Author:         James Pham
-Version:        1.0
+Version:        1.0.1
 Author URI:     https://jamespham.io
 */
 
@@ -86,7 +86,6 @@ class PostFeedNotification {
         $feeds = get_option('pfn_dashboard_feeds');
 
         if ( !$feeds ) { // CREATE NEW ARRAY OF FEED IF OPTION DOES NOT EXIST YET
-
             add_option( 'pfn_dashboard_feeds', array( $term_id ) );
             $_SESSION['success']  = "Feed for \"{$wp_term->name}\" successfully created!.";
             wp_redirect('/wp-admin/options-general.php?page=post-feed');
@@ -140,7 +139,7 @@ class PostFeedNotification {
 
         }
 
-        $feeds = array_filter( $feeds, fn ($t_id) => $t_id !==  $term_id );
+        $feeds = array_filter( $feeds, function ($t_id) use ($term_id) { return $t_id  !==  $term_id; });
 
         // delete entire option if there was only one feed
         count($feeds)
@@ -237,8 +236,8 @@ class PostFeedNotification {
     public function dashboard_styles() {
 
         $feeds          = get_option('pfn_dashboard_feeds');
-        $wp_terms       = array_map( fn (int $term_id) => get_term($term_id), $feeds );
-        $dashboard_ids  = array_map( fn (WP_Term $wp_term) => "#pfn-dashboard-{$wp_term->slug}", $wp_terms );
+        $wp_terms       = array_map( function (int $term_id) { return get_term($term_id); }, $feeds );
+        $dashboard_ids  = array_map( function (WP_Term $wp_term) { return "#pfn-dashboard-{$wp_term->slug}"; }, $wp_terms );
         $css_selectors  = join(', ', $dashboard_ids);
 
         if ( !empty($feeds) ) {

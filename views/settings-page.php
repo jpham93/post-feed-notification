@@ -37,7 +37,7 @@ do_action('qm/debug', $feeds);
                      * strip "uncategorized" terms from the drop down
                      * @var WP_Term[]
                      */
-                    $post_categories = array_filter( get_categories( $args ), fn( WP_Term $wp_term ) => $wp_term->slug !== 'uncategorized' );
+                    $post_categories = array_filter( get_categories( $args ), function( WP_Term $wp_term ) { return $wp_term->slug !== 'uncategorized'; });
 
                     foreach ( $post_categories as $wp_term ) :
                         ?>
