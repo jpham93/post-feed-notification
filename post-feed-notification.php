@@ -199,7 +199,7 @@ class PostFeedNotification {
             /**
              * @var WP_Term[]
              */
-            $wp_terms = array_map( fn(int $term_id) => get_term($term_id), $feeds );
+            $wp_terms = array_map( function ( int $term_id ) { return get_term($term_id); }, $feeds );
 
             foreach ( $wp_terms as $wp_term ) {
 
